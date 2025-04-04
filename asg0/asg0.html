@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Draw a black rectangle (canvas version)</title>
+    </head>
+    <body onload="main()">
+        <canvas id="example" width="400" height="400">
+            Please use a browser that supports "canvas"
+        </canvas><br/>
+        V1 x: <input type="text" id="x1"/>
+        y: <input type="text" id="y1"/><br/>
+        V2 x: <input type="text" id="x2"/>
+        y: <input type="text" id="y2"/><br/>
+        <input type="button" 
+               value="Draw" 
+               onclick="handleDrawEvent(
+               document.getElementById('x1').value, 
+               document.getElementById('y1').value, 
+               document.getElementById('x2').value, 
+               document.getElementById('y2').value
+               )"/><br/>
+        <script src="lib/cuon-matrix-cse160.js"></script>
+        <script src="asg0.js"></script>
+    </body>
+</html>
