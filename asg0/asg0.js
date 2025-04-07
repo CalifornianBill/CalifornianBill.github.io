@@ -90,7 +90,7 @@ function handleDrawEvent(x1, y1, x2, y2, op, scalar) {
             break;
         case 'area':
             var cross = Vector3.cross(v1, v2);
-            console.log("Area: " + (cross * 0.5));
+            console.log("Area: " + cross.magnitude() * 0.5);
             break;
     }
     if (v3) {

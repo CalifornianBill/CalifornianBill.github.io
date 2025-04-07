@@ -83,7 +83,9 @@
     text = document.getElementById("test7")
     vect1 = new Vector3([34, 6, 34.2222])
     vect2 = new Vector3([87, 34.8675, -234])
-    v = Vector3.cross(vect1, vect2).elements
+    v = Vector3.cross(vect1, vect2)
+    console.log(v)
+    v = v.elements
     verify(v, [-2597.2425585, 10933.3314, 663.495], text)
 
     // Test 8 magnitude([45.2, -23.7, 9923])
