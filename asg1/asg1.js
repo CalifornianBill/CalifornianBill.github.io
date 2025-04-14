@@ -52,6 +52,10 @@ function main() {
 
   // Specify the color for clearing <canvas>
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  
+  // Enable alpha blending
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT);
@@ -70,7 +74,8 @@ function click(ev, gl, canvas, a_Position, u_FragColor, u_PointSize) {
   var red = parseFloat(document.getElementById('red').value) || 0;
   var green = parseFloat(document.getElementById('green').value) || 0;
   var blue = parseFloat(document.getElementById('blue').value) || 0;
-  var color = [red, green, blue, 1]; // RGBA color
+  var alpha = parseFloat(document.getElementById('alpha').value) || 0;
+  var color = [red, green, blue, alpha]; // RGBA color
 
   var size = parseFloat(document.getElementById('size').value) || 10;
   var sides = parseInt(document.getElementById('segments').value) || 10; // Number of sides for circle
