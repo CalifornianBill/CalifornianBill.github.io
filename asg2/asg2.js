@@ -32,6 +32,8 @@ class Cube {
   }
 }
 
+WALK_ANIMATION = 0; // Animation progress
+
 function main() {
   var canvasVals = setupWebGL();
   var canvas = canvasVals[0];
@@ -61,90 +63,7 @@ function main() {
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   
-  //Body
-  var cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(0, 0, 0);
-  M.scale(0.9/2, 0.6/2, 0.6/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
-
-  //Mane
-  cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(-0.75/2, 0.05/2, 0);
-  M.scale(0.6/2, 0.7/2, 0.8/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
-
-  //Head
-  cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(-1.2/2, 0.05/2, 0);
-  M.scale(0.3/2, 0.6/2, 0.6/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
-
-  //Snout
-  cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(-1.5/2, -0.1/2, 0);
-  M.scale(0.3/2, 0.3/2, 0.3/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
-
-  //Ears
-  cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(-1.1/2, 0.45/2, 0.2/2);
-  M.scale(0.1/2, 0.2/2, 0.2/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
-  
-  cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(-1.1/2, 0.45/2, -0.2/2);
-  M.scale(0.1/2, 0.2/2, 0.2/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
-
-  //Legs
-  cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(-0.8/2, -0.65/2, 0.15/2);
-  M.scale(0.2/2, 0.7/2, 0.2/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
-  
-  cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(0.25/2, -0.65/2, 0.15/2);
-  M.scale(0.2/2, 0.7/2, 0.2/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
-  
-  cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(-0.8/2, -0.65/2, -0.15/2);
-  M.scale(0.2/2, 0.7/2, 0.2/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
-  
-  cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(0.25/2, -0.65/2, -0.15/2);
-  M.scale(0.2/2, 0.7/2, 0.2/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
-
-  //Tail
-  cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(0.65/2, -0.15/2, 0/2);
-  M.rotate(45, 0, 0, 1);
-  M.scale(0.2/2, 0.8/2, 0.2/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
+  populateCubeList(cubeList);
 
   renderScene(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList);
 
@@ -157,7 +76,15 @@ function main() {
 
   document.getElementById('ySlider').addEventListener('input', function() {
     updateRotationAngle(gl, u_GlobalRotation);
-    clearCanvas(gl);renderScene(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList);
+    clearCanvas(gl);
+    renderScene(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList);
+  });
+
+  document.getElementById('walk').addEventListener('input', function() {
+    WALK_ANIMATION = document.getElementById('walk').value; // get current slider value
+    populateCubeList(cubeList);
+    clearCanvas(gl);
+    renderScene(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList);
   });
 }
 
@@ -334,4 +261,121 @@ function renderScene(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, c
   for (var i = 0; i < cubeList.length; i++) {
     drawCube(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList[i]);
   }
+}
+
+function populateCubeList(cubeList) {
+  // Clear the cube list
+  clearCubeList(cubeList);
+
+  //Body
+  var cube = new Cube(); // Create a cube object
+  M = new Matrix4();
+  M.setTranslate(0, 0, 0);
+  M.scale(0.9/2, 0.6/2, 0.6/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+
+  //Mane
+  cube = new Cube(); // Create a cube object
+  M = new Matrix4();
+  M.setTranslate(-0.75/2, 0.05/2, 0);
+  M.scale(0.6/2, 0.7/2, 0.8/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+
+  //Head
+  cube = new Cube(); // Create a cube object
+  M = new Matrix4();
+  M.setTranslate(-1.2/2, 0.05/2, 0);
+  M.scale(0.3/2, 0.6/2, 0.6/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+
+  //Snout
+  cube = new Cube(); // Create a cube object
+  M = new Matrix4();
+  M.setTranslate(-1.5/2, -0.1/2, 0);
+  M.scale(0.3/2, 0.3/2, 0.3/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+
+  //Ears
+  cube = new Cube(); // Create a cube object
+  M = new Matrix4();
+  M.setTranslate(-1.1/2, 0.45/2, 0.2/2);
+  M.scale(0.1/2, 0.2/2, 0.2/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+  
+  cube = new Cube(); // Create a cube object
+  M = new Matrix4();
+  M.setTranslate(-1.1/2, 0.45/2, -0.2/2);
+  M.scale(0.1/2, 0.2/2, 0.2/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+
+  //Legs
+  cube = new Cube(); // Create a cube object
+  M = new Matrix4();
+  // Rotate
+  M.translate(-0.4, -0.15, 0.075);
+  M.rotate(WALK_ANIMATION*45, 0, 0, 1);
+  M.translate(0.4, 0.15, -0.075);
+  //Translate and scale
+  M.translate(-0.8/2, -0.65/2, 0.15/2);
+  M.scale(0.2/2, 0.7/2, 0.2/2);
+  cube.matrix = M;
+  cubeList.push(cube);
+  
+  cube = new Cube(); // Create a cube object
+  M = new Matrix4();
+  // Rotate
+  M.translate(0.125, -0.15, 0.075);
+  M.rotate(WALK_ANIMATION*45, 0, 0, 1);
+  M.translate(-0.125, 0.15, -0.075);
+  // Translate and scale
+  M.translate(0.125, -0.325, 0.075);
+  M.scale(0.1, 0.35, 0.1);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+  
+  cube = new Cube(); // Create a cube object
+  M = new Matrix4();
+  // Rotate
+  M.translate(-0.4, -0.15, 0.075); // Notice the opposites
+  M.rotate(-WALK_ANIMATION*45, 0, 0, 1);
+  M.translate(0.4, 0.15, -0.075);
+  //Translate and scale
+  M.translate(-0.8/2, -0.65/2, -0.15/2);
+  M.scale(0.2/2, 0.7/2, 0.2/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+  
+  cube = new Cube(); // Create a cube object
+  M = new Matrix4();
+  // Rotate
+  M.translate(0.125, -0.15, 0.075);
+  M.rotate(-WALK_ANIMATION*45, 0, 0, 1);
+  M.translate(-0.125, 0.15, -0.075);
+  // Translate and scale
+  M.translate(0.25/2, -0.65/2, -0.15/2);
+  M.scale(0.2/2, 0.7/2, 0.2/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+
+  //Tail
+  cube = new Cube(); // Create a cube object
+  M = new Matrix4();
+  M.setTranslate(0.65/2, -0.15/2, 0/2);
+  M.rotate(45, 0, 0, 1);
+  M.scale(0.2/2, 0.8/2, 0.2/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+}
+
+function clearCubeList(cubeList) {
+  for (var i = 0; i < cubeList.length; i++) {
+    cubeList[i] = null; // Clear the cube object
+  }
+  cubeList.length = 0; // Clear the array
 }
