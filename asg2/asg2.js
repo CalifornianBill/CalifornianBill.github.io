@@ -35,6 +35,7 @@ class Cube {
 WALK_ANIMATION = 0; // Animation progress
 HEAD_ROTATION_SIDE = 0; // Head rotation progress
 EAR_WIGGLE = 0; // Ear wiggle progress
+MOUTH = 0;
 
 let lastTime = 0;
 const fpsLimit = 144; // Set the maximum FPS
@@ -44,8 +45,10 @@ let frameCount = 0;
 let fps = 0;
 let deltaSum = 0;
 let startTime = null; // Start time for animation
+let startTime2 = null; // Start time for animation
 
 var gl;
+var canvas;
 var a_Position;
 var a_Color;
 var u_ModelMatrix;
@@ -54,6 +57,10 @@ var cubeList = [];
 
 let direction = 1;
 let isWalkAnim = false;
+let isDrawPyramid = false;
+let isBarking = false;
+let isAnimating = false;
+let _prevAnim = 0;
 
 function main() {
   setupWebGL();
@@ -76,6 +83,10 @@ function main() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   
   populateCubeList();
+
+  if(isDrawPyramid) {
+    drawPyramid(); // Draw the pyramid
+  }
 
   requestAnimationFrame(tick);
 
@@ -106,15 +117,36 @@ function main() {
     renderScene();
   });
 
+  document.getElementById('mouth').addEventListener('input', function() {
+    MOUTH = document.getElementById('mouth').value; // get current slider value
+    populateCubeList();
+    clearCanvas();
+    renderScene();
+  });
+
   const button = document.getElementById('walkAnimButton');
   button.addEventListener('click', () => {
       isWalkAnim = !isWalkAnim;
+  });
+
+  const button2 = document.getElementById('pyramidButton');
+  button2.addEventListener('click', () => {
+    isDrawPyramid = !isDrawPyramid;
+    console.log(isDrawPyramid);
+    renderScene();
+  });
+
+  canvas.addEventListener('click', function(mouseEvent) {
+    if (mouseEvent.shiftKey) {
+      console.log('Shift key pressed!');
+      isBarking = true;
+    }
   });
 }
 
 function setupWebGL() {
   // Retrieve <canvas> element
-  var canvas = document.getElementById('webgl');
+  canvas = document.getElementById('webgl');
   if (!canvas) {
     console.log('Failed to retrieve the <canvas> element');
     return;
@@ -281,6 +313,9 @@ function renderScene() {
   for (var i = 0; i < cubeList.length; i++) {
     drawCube(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList[i]);
   }
+  if(isDrawPyramid) {
+    drawPyramid(); // Draw the pyramid
+  }
 }
 
 function populateCubeList() {
@@ -379,34 +414,42 @@ function populateCubeList() {
   //Snout
   cube = new Cube(); // Create a cube object
   cube.colors = [
+    [0.95, 0.95, 0.95, 1.0], // light off-white
+    [0.9, 0.9, 0.9, 1.0],    // medium off-white
+    [0.85, 0.85, 0.85, 1.0], // darker off-white
+    [0.85, 0.5, 0.5, 1.0],    // even darker off-white
+    [0.75, 0.75, 0.75, 1.0], // darker still
+    [0.7, 0.7, 0.7, 1.0]     // darkest off-white
+  ];
+  M3 = new Matrix4();
+  // Rotate around the rear face
+  M3.translate(-0.6, 0.025, 0);
+  M3.rotate(HEAD_ROTATION_SIDE*45, 45, 0, 1);
+  M3.translate(0.6, -0.025, 0);
+  // Translate and scale
+  M3.translate(-1.5/2, -0.0/2, 0);
+  M3.scale(0.3/2, 0.2/2, 0.3/2);
+  cube.matrix = M3; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+  
+  cube = new Cube(); // Create a cube object
+  cube.colors = [
     [0.1, 0.1, 0.1, 1.0], // light off-white
     [0.1, 0.1, 0.1, 1.0],    // medium off-white
-    [0.85, 0.85, 0.85, 1.0], // Top
+    [0.85, 0.5, 0.5, 1.0], // Top
     [0.8, 0.8, 0.8, 1.0],    // even darker off-white
     [0.75, 0.75, 0.75, 1.0], // Right
     [0.1, 0.1, 0.1, 1.0]  // Left
   ];
-  M = new Matrix4();
+  M = new Matrix4(M3);
   // Rotate around the rear face
-  M.translate(-0.6, 0.025, 0);
-  M.rotate(HEAD_ROTATION_SIDE*45, 45, 0, 1);
-  M.translate(0.6, -0.025, 0);
+  M.translate(0.3, -0.5, 0);
+  M.rotate(MOUTH*45, 0, 0, 1);
+  M.translate(-0.3, 0.5, 0);
   // Translate and scale
-  M.translate(-1.5/2, -0.15/2, 0);
-  M.scale(0.3/2, 0.1/2, 0.3/2);
-  cube.matrix = M; // Set the model matrix for the cube
-  cubeList.push(cube); // Add the cube to the list
-  
-  cube = new Cube(); // Create a cube object
-  cube.colors = white;
-  M = new Matrix4();
-  // Rotate around the rear face
-  M.translate(-0.6, 0.025, 0);
-  M.rotate(HEAD_ROTATION_SIDE*45, 45, 0, 1);
-  M.translate(0.6, -0.025, 0);
-  // Translate and scale
-  M.translate(-1.5/2, -0.0/2, 0);
-  M.scale(0.3/2, 0.2/2, 0.3/2);
+  M.translate(0, -0.7, 0);
+  M.scale(1, 0.5, 1);
+
   cube.matrix = M; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
 
@@ -567,20 +610,115 @@ function updateFPSText(fps) {
   fpsElement.textContent = `FPS: ${fps.toFixed(1)}`;
 }
 
-function lerp(start, end, t) {
-  return start + (end - start) * t;
-}
-
 function updateAnimationAngles(deltaTime) {
   if(isWalkAnim) {
     // Get elapsed time since startTime
     let elapsedTime = performance.now() - startTime;
 
-    // Define a duration for the full interpolation (e.g., 2 seconds)
     let duration = 1000;
 
     WALK_ANIMATION = Math.sin((elapsedTime / duration) * 2 * Math.PI);
     HEAD_ROTATION_SIDE = Math.sin((elapsedTime / duration) * 2 * Math.PI) / 45 * 10; // Rotate head side to side
     populateCubeList(); // Update the cube list with the new WALK_ANIMATION value
   }
+
+  if(isBarking) {
+    if (startTime2 === null) {
+      startTime2 = performance.now(); // Capture the start time if not set
+    }
+    let duration2 = 1000;
+    let elapsedTime2 = performance.now() - startTime2;
+    var sound = new Audio('bark.mp3');
+    let hasBarked = false; // Flag to check if the sound has already played
+    setTimeout(() => {
+      isBarking = false; // Reset the flag to prevent continuous barking
+      MOUTH = 0; // Reset mouth animation
+      populateCubeList(); // Update the cube list with the new WALK_ANIMATION value
+      startTime2 = null; // Reset start time for barking
+    }, duration2); // Duration of the animation (1 second)
+
+    _anim = (Math.sin((elapsedTime2 / duration2) * 2 * Math.PI) + 1) / 2;
+    MOUTH = _anim;
+    populateCubeList(); // Update the cube list with the new WALK_ANIMATION value
+    console.log(_anim);
+
+    if (_prevAnim < 0.99 && _anim >= 0.99 && !hasBarked) {
+      hasBarked = true; // Set the flag to indicate sound has played
+      sound.play();
+    }
+
+    _prevAnim = _anim;
+  }
+}
+
+function drawPyramid() {
+  // Define vertices for a pyramid (base is a square, top is a single point)
+  var vertices = new Float32Array([
+    // Base (square)
+    -0.5, 0.0, -0.5,
+     0.5, 0.0, -0.5,
+     0.5, 0.0,  0.5,
+    -0.5, 0.0,  0.5,
+    // Top point
+     0.0, 1.0,  0.0,
+  ]);
+
+  // Define colors for each face
+  var colors = new Float32Array([
+    0.3, 0.3, 0.3, 1.0, // Uniform gray color for all vertices
+    0.5, 0.5, 0.5, 1.0,
+    0.6, 0.6, 0.6, 1.0,
+    0.5, 0.5, 0.5, 1.0,
+    0.4, 0.4, 0.4, 1.0,
+  ]);
+
+  // Define indices for the pyramid (triangles)
+  var indices = new Uint8Array([
+    // Base (two triangles)
+    0, 1, 2,
+    2, 3, 0,
+    // Sides
+    0, 1, 4,
+    1, 2, 4,
+    2, 3, 4,
+    3, 0, 4,
+  ]);
+
+  var n = indices.length;
+
+  // Create buffers
+  var vertexBuffer = gl.createBuffer();
+  var colorBuffer = gl.createBuffer();
+  var indexBuffer = gl.createBuffer();
+
+  if (!vertexBuffer || !colorBuffer || !indexBuffer) {
+    console.log('Failed to create buffers');
+    return;
+  }
+
+  // Write vertex coordinates
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+  gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(a_Position);
+
+  // Write colors
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+  gl.vertexAttribPointer(a_Color, 4, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(a_Color);
+
+  // Write indices
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+
+  // Set matrix
+  var modelMatrix = new Matrix4();
+  modelMatrix.setIdentity(); // Set to identity matrix
+  modelMatrix.scale(0.2, 0.3, 0.2); // Scale down the pyramid
+  modelMatrix.translate(0.0, 0.75, 0.0); // Translate to the center of the canvas
+  gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+
+  // Draw
+  gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
 }
