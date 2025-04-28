@@ -42,6 +42,7 @@ const frameTime = 1000 / fpsLimit; // Time per frame for the desired FPS
 let frameCount = 0;
 let fps = 0;
 let deltaSum = 0;
+let startTime = null; // Start time for animation
 
 var gl;
 var a_Position;
@@ -49,6 +50,9 @@ var a_Color;
 var u_ModelMatrix;
 var u_GlobalRotation;
 var cubeList = [];
+
+let direction = 1;
+let isWalkAnim = false;
 
 function main() {
   setupWebGL();
@@ -70,7 +74,7 @@ function main() {
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   
-  populateCubeList(cubeList);
+  populateCubeList();
 
   requestAnimationFrame(tick);
 
@@ -96,9 +100,14 @@ function main() {
 
   document.getElementById('headSide').addEventListener('input', function() {
     HEAD_ROTATION_SIDE = document.getElementById('headSide').value; // get current slider value
-    populateCubeList(cubeList);
+    populateCubeList();
     clearCanvas();
     renderScene();
+  });
+
+  const button = document.getElementById('walkAnimButton');
+  button.addEventListener('click', () => {
+      isWalkAnim = !isWalkAnim;
   });
 }
 
@@ -346,8 +355,8 @@ function populateCubeList() {
   M.rotate(WALK_ANIMATION*45, 0, 0, 1);
   M.translate(0.4, 0.15, -0.075);
   //Translate and scale
-  M.translate(-0.8/2, -0.65/2, 0.15/2);
-  M.scale(0.2/2, 0.7/2, 0.2/2);
+  M.translate(-0.8/2, -0.6/2, 0.15/2);
+  M.scale(0.2/2, 0.8/2, 0.2/2);
   cube.matrix = M;
   cubeList.push(cube);
   
@@ -358,8 +367,8 @@ function populateCubeList() {
   M.rotate(WALK_ANIMATION*45, 0, 0, 1);
   M.translate(-0.125, 0.15, -0.075);
   // Translate and scale
-  M.translate(0.125, -0.325, 0.075);
-  M.scale(0.1, 0.35, 0.1);
+  M.translate(0.125, -0.6/2, 0.075);
+  M.scale(0.1, 0.8/2, 0.1);
   cube.matrix = M; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
   
@@ -370,8 +379,8 @@ function populateCubeList() {
   M.rotate(-WALK_ANIMATION*45, 0, 0, 1);
   M.translate(0.4, 0.15, -0.075);
   //Translate and scale
-  M.translate(-0.8/2, -0.65/2, -0.15/2);
-  M.scale(0.2/2, 0.7/2, 0.2/2);
+  M.translate(-0.8/2, -0.6/2, -0.15/2);
+  M.scale(0.2/2, 0.8/2, 0.2/2);
   cube.matrix = M; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
   
@@ -382,8 +391,8 @@ function populateCubeList() {
   M.rotate(-WALK_ANIMATION*45, 0, 0, 1);
   M.translate(-0.125, 0.15, -0.075);
   // Translate and scale
-  M.translate(0.25/2, -0.65/2, -0.15/2);
-  M.scale(0.2/2, 0.7/2, 0.2/2);
+  M.translate(0.25/2, -0.6/2, -0.15/2);
+  M.scale(0.2/2, 0.8/2, 0.2/2);
   cube.matrix = M; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
 
@@ -405,6 +414,10 @@ function clearCubeList() {
 }
 
 function tick() {
+  if (!startTime) {
+    startTime = performance.now(); // Capture the start time if not set
+  }
+
   const currentTime = performance.now();
   const deltaTime = currentTime - lastTime;
 
@@ -416,6 +429,17 @@ function tick() {
     deltaSum = 0; // Reset delta time sum
     lastTime = currentTime; // Reset the last time
     updateFPSText(fps); // Update the on-screen FPS counter
+  }
+
+  if(isWalkAnim) {
+    // Get elapsed time since startTime
+    let elapsedTime = performance.now() - startTime;
+
+    // Define a duration for the full interpolation (e.g., 2 seconds)
+    let duration = 1000;
+
+    WALK_ANIMATION = Math.sin((elapsedTime / duration) * 2 * Math.PI);
+    populateCubeList(); // Update the cube list with the new WALK_ANIMATION value
   }
 
   // Only update and render if enough time has passed to maintain the FPS limit
@@ -431,4 +455,8 @@ function tick() {
 function updateFPSText(fps) {
   const fpsElement = document.getElementById('fpsCounter');
   fpsElement.textContent = `FPS: ${fps.toFixed(1)}`;
+}
+
+function lerp(start, end, t) {
+  return start + (end - start) * t;
 }
