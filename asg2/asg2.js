@@ -62,6 +62,13 @@ let isBarking = false;
 let isAnimating = false;
 let _prevAnim = 0;
 
+let isDragging = false; // Flag to check if the mouse is being dragged
+let lastX = 0; // Last X position of the mouse
+let lastY = 0; // Last Y position of the mouse
+
+let xAngle = 720; // Initial X angle
+let yAngle = 720; // Initial Y angle
+
 function main() {
   setupWebGL();
   connectVariablesToGLSL();
@@ -132,15 +139,46 @@ function main() {
   const button2 = document.getElementById('pyramidButton');
   button2.addEventListener('click', () => {
     isDrawPyramid = !isDrawPyramid;
-    console.log(isDrawPyramid);
     renderScene();
   });
 
   canvas.addEventListener('click', function(mouseEvent) {
     if (mouseEvent.shiftKey) {
-      console.log('Shift key pressed!');
       isBarking = true;
     }
+  });
+
+  // Add event listeners for mouse interactions
+  canvas.addEventListener('mousedown', (e) => {
+    isDragging = true;  // Start dragging
+    lastX = e.clientX;  // Store the mouse's initial X position
+    lastY = e.clientY;  // Store the mouse's initial Y position
+  });
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (!isDragging) return; // Only rotate when dragging
+    
+    const deltaX = e.clientX - lastX; // Calculate the horizontal movement
+    const deltaY = e.clientY - lastY; // Calculate the vertical movement
+
+    // Update angles based on the movement
+    xAngle += deltaY * 0.2; // Adjust the sensitivity here
+    yAngle += deltaX * 0.2; // Adjust the sensitivity here
+    
+    // Update the rotation matrix with the new angles, considering sliders
+    updateRotationAngle();
+
+    // Update the last mouse position for the next move
+    lastX = e.clientX;
+    lastY = e.clientY;
+  });
+
+  canvas.addEventListener('mouseup', () => {
+    isDragging = false; // Stop dragging when mouse is released
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    isDragging = false; // Stop dragging if the mouse leaves the canvas
   });
 }
 
@@ -296,14 +334,19 @@ function drawCube(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cube
 
 function updateRotationAngle() {
   var xSlider = document.getElementById('xSlider');
-  var xAngle = xSlider.value; // get current slider value
+  var xSliderValue = xSlider.value; // get current slider value
   var ySlider = document.getElementById('ySlider');
-  var yAngle = ySlider.value; // get current slider value
+  var ySliderValue = ySlider.value; // get current slider value
 
+  // Combine the slider values and mouse-dragged angles
+  var finalXAngle = (xSliderValue + xAngle) % 360; // Combine slider value with mouse-controlled angle
+  var finalYAngle = (ySliderValue - yAngle) % 360; // Combine slider value with mouse-controlled angle
+
+  // Create the rotation matrix
   var rotationMatrix = new Matrix4();
   rotationMatrix.setIdentity(); // Start with identity matrix
-  rotationMatrix.rotate(-xAngle, 1, 0, 0); // Rotate around X axis
-  rotationMatrix.rotate(yAngle, 0, 1, 0); // Rotate around Y axis
+  rotationMatrix.rotate(-finalXAngle, 1, 0, 0); // Rotate around X axis
+  rotationMatrix.rotate(finalYAngle, 0, 1, 0); // Rotate around Y axis
 
   gl.uniformMatrix4fv(u_GlobalRotation, false, rotationMatrix.elements);
 }
@@ -447,7 +490,7 @@ function populateCubeList() {
   M.rotate(MOUTH*45, 0, 0, 1);
   M.translate(-0.3, 0.5, 0);
   // Translate and scale
-  M.translate(0, -0.7, 0);
+  M.translate(0, -0.75, 0);
   M.scale(1, 0.5, 1);
 
   cube.matrix = M; // Set the model matrix for the cube
@@ -633,14 +676,13 @@ function updateAnimationAngles(deltaTime) {
     setTimeout(() => {
       isBarking = false; // Reset the flag to prevent continuous barking
       MOUTH = 0; // Reset mouth animation
-      populateCubeList(); // Update the cube list with the new WALK_ANIMATION value
+      populateCubeList();
       startTime2 = null; // Reset start time for barking
     }, duration2); // Duration of the animation (1 second)
 
     _anim = (Math.sin((elapsedTime2 / duration2) * 2 * Math.PI) + 1) / 2;
     MOUTH = _anim;
     populateCubeList(); // Update the cube list with the new WALK_ANIMATION value
-    console.log(_anim);
 
     if (_prevAnim < 0.99 && _anim >= 0.99 && !hasBarked) {
       hasBarked = true; // Set the flag to indicate sound has played
