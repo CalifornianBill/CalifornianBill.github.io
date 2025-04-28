@@ -34,6 +34,7 @@ class Cube {
 
 WALK_ANIMATION = 0; // Animation progress
 HEAD_ROTATION_SIDE = 0; // Head rotation progress
+EAR_WIGGLE = 0; // Ear wiggle progress
 
 let lastTime = 0;
 const fpsLimit = 144; // Set the maximum FPS
@@ -331,19 +332,25 @@ function populateCubeList() {
   //Ears
   cube = new Cube(); // Create a cube object
   M = new Matrix4(M1);
+  // Rotate
+  M.translate(0, 0.65/2, 0.3); // Translate to the bottom of the cube
+  M.rotate(WALK_ANIMATION * 10, 1, 0, 0); // Rotate around the Y-axis (side-to-side)
+  M.translate(0, -0.65/2, -0.3); // Translate back
   // Translate and scale
-  M.translate(0.65/2, 1.3/2, 0.65/2);
-  M.scale(1/0.15, 1/0.3, 1/0.3); // Inverse scale to make it look like a cube
-  M.scale(0.1/2, 0.2/2, 0.2/2);
+  M.translate(0.65/2, 1.1/2, 0.65/2);
+  M.scale((1/0.15) * (0.1/2), (1/0.3) * (0.3/2), (1/0.3) * (0.2/2));
   cube.matrix = M; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
   
   cube = new Cube(); // Create a cube object
   M = new Matrix4(M1);
+  // Rotate
+  M.translate(0, 0.65/2, -0.3); // Translate to the bottom of the cube
+  M.rotate(WALK_ANIMATION * 10, 1, 0, 0); // Rotate around the Y-axis (side-to-side)
+  M.translate(0, -0.65/2, 0.3); // Translate back
   // Translate and scale
-  M.translate(0.65/2, 1.3/2, -0.65/2);
-  M.scale(1/0.15, 1/0.3, 1/0.3); // Inverse scale to make it look like a cube
-  M.scale(0.1/2, 0.2/2, 0.2/2);
+  M.translate(0.65/2, 1.1/2, -0.65/2);
+  M.scale((1/0.15) * (0.1/2), (1/0.3) * (0.3/2), (1/0.3) * (0.2/2));
   cube.matrix = M; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
 
@@ -434,16 +441,7 @@ function tick() {
     updateFPSText(fps); // Update the on-screen FPS counter
   }
 
-  if(isWalkAnim) {
-    // Get elapsed time since startTime
-    let elapsedTime = performance.now() - startTime;
-
-    // Define a duration for the full interpolation (e.g., 2 seconds)
-    let duration = 1000;
-
-    WALK_ANIMATION = Math.sin((elapsedTime / duration) * 2 * Math.PI);
-    populateCubeList(); // Update the cube list with the new WALK_ANIMATION value
-  }
+  updateAnimationAngles(deltaTime); // Update animation angles based on delta time
 
   // Only update and render if enough time has passed to maintain the FPS limit
   if (deltaTime >= frameTime) {
@@ -462,4 +460,18 @@ function updateFPSText(fps) {
 
 function lerp(start, end, t) {
   return start + (end - start) * t;
+}
+
+function updateAnimationAngles(deltaTime) {
+  if(isWalkAnim) {
+    // Get elapsed time since startTime
+    let elapsedTime = performance.now() - startTime;
+
+    // Define a duration for the full interpolation (e.g., 2 seconds)
+    let duration = 1000;
+
+    WALK_ANIMATION = Math.sin((elapsedTime / duration) * 2 * Math.PI);
+    HEAD_ROTATION_SIDE = Math.sin((elapsedTime / duration) * 2 * Math.PI) / 45 * 10; // Rotate head side to side
+    populateCubeList(); // Update the cube list with the new WALK_ANIMATION value
+  }
 }
