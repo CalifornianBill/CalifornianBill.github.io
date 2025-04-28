@@ -287,8 +287,18 @@ function populateCubeList() {
   // Clear the cube list
   clearCubeList(cubeList);
 
+  var white = [
+    [0.95, 0.95, 0.95, 1.0], // light off-white
+    [0.9, 0.9, 0.9, 1.0],    // medium off-white
+    [0.85, 0.85, 0.85, 1.0], // darker off-white
+    [0.8, 0.8, 0.8, 1.0],    // even darker off-white
+    [0.75, 0.75, 0.75, 1.0], // darker still
+    [0.7, 0.7, 0.7, 1.0]     // darkest off-white
+  ];
+
   //Body
   var cube = new Cube(); // Create a cube object
+  cube.colors = white;
   M = new Matrix4();
   M.setTranslate(0, 0, 0);
   M.scale(0.9/2, 0.6/2, 0.6/2);
@@ -297,6 +307,14 @@ function populateCubeList() {
 
   //Mane
   cube = new Cube(); // Create a cube object
+  cube.colors = [
+    [0.95, 0.95, 0.95, 1.0], // light off-white
+    [0.9, 0.9, 0.9, 1.0],    // medium off-white
+    [0.85, 0.85, 0.85, 1.0], // Top
+    [0.8, 0.8, 0.8, 1.0],    // even darker off-white
+    [0.75, 0.75, 0.75, 1.0], // Right
+    [0.75, 0.25, 0.25, 1.0]  // Left
+  ];
   M = new Matrix4();
   M.setTranslate(-0.75/2, 0.05/2, 0);
   M.scale(0.6/2, 0.7/2, 0.8/2);
@@ -305,6 +323,7 @@ function populateCubeList() {
 
   //Head
   cube = new Cube(); // Create a cube object
+  cube.colors = white;
   M1 = new Matrix4();
   // Rotate around the rear face
   M1.translate(-0.6, 0.025, 0);
@@ -316,21 +335,105 @@ function populateCubeList() {
   cube.matrix = M1; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
 
-  //Snout
+  //Eyes
   cube = new Cube(); // Create a cube object
+  cube.colors = [
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0]
+  ];
   M = new Matrix4();
   // Rotate around the rear face
   M.translate(-0.6, 0.025, 0);
   M.rotate(HEAD_ROTATION_SIDE*45, 45, 0, 1);
   M.translate(0.6, -0.025, 0);
   // Translate and scale
-  M.translate(-1.5/2, -0.1/2, 0);
-  M.scale(0.3/2, 0.3/2, 0.3/2);
+  M.translate(-1.31/2, 0.15/2, 0.15/2);
+  M.scale(0.1/2, 0.1/2, 0.1/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list.
+  
+  cube = new Cube(); // Create a cube object
+  cube.colors = [
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0]
+  ];
+  M = new Matrix4();
+  // Rotate around the rear face
+  M.translate(-0.6, 0.025, 0);
+  M.rotate(HEAD_ROTATION_SIDE*45, 45, 0, 1);
+  M.translate(0.6, -0.025, 0);
+  // Translate and scale
+  M.translate(-1.31/2, 0.15/2, -0.15/2);
+  M.scale(0.1/2, 0.1/2, 0.1/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+
+  //Snout
+  cube = new Cube(); // Create a cube object
+  cube.colors = [
+    [0.1, 0.1, 0.1, 1.0], // light off-white
+    [0.1, 0.1, 0.1, 1.0],    // medium off-white
+    [0.85, 0.85, 0.85, 1.0], // Top
+    [0.8, 0.8, 0.8, 1.0],    // even darker off-white
+    [0.75, 0.75, 0.75, 1.0], // Right
+    [0.1, 0.1, 0.1, 1.0]  // Left
+  ];
+  M = new Matrix4();
+  // Rotate around the rear face
+  M.translate(-0.6, 0.025, 0);
+  M.rotate(HEAD_ROTATION_SIDE*45, 45, 0, 1);
+  M.translate(0.6, -0.025, 0);
+  // Translate and scale
+  M.translate(-1.5/2, -0.15/2, 0);
+  M.scale(0.3/2, 0.1/2, 0.3/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+  
+  cube = new Cube(); // Create a cube object
+  cube.colors = white;
+  M = new Matrix4();
+  // Rotate around the rear face
+  M.translate(-0.6, 0.025, 0);
+  M.rotate(HEAD_ROTATION_SIDE*45, 45, 0, 1);
+  M.translate(0.6, -0.025, 0);
+  // Translate and scale
+  M.translate(-1.5/2, -0.0/2, 0);
+  M.scale(0.3/2, 0.2/2, 0.3/2);
+  cube.matrix = M; // Set the model matrix for the cube
+  cubeList.push(cube); // Add the cube to the list
+
+  //Nose
+  cube = new Cube(); // Create a cube object
+  cube.colors = [
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0],
+    [0.1, 0.1, 0.1, 1.0]
+  ];
+  M = new Matrix4();
+  // Rotate around the rear face
+  M.translate(-0.6, 0.025, 0);
+  M.rotate(HEAD_ROTATION_SIDE*45, 45, 0, 1);
+  M.translate(0.6, -0.025, 0);
+  // Translate and scale
+  M.translate(-1.61/2, 0.06/2, 0);
+  M.scale(0.1/2, 0.1/2, 0.1/2);
   cube.matrix = M; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
 
   //Ears
   cube = new Cube(); // Create a cube object
+  cube.colors = white;
   M = new Matrix4(M1);
   // Rotate
   M.translate(0, 0.65/2, 0.3); // Translate to the bottom of the cube
@@ -343,6 +446,7 @@ function populateCubeList() {
   cubeList.push(cube); // Add the cube to the list
   
   cube = new Cube(); // Create a cube object
+  cube.colors = white;
   M = new Matrix4(M1);
   // Rotate
   M.translate(0, 0.65/2, -0.3); // Translate to the bottom of the cube
@@ -356,6 +460,7 @@ function populateCubeList() {
 
   //Legs
   cube = new Cube(); // Create a cube object
+  cube.colors = white;
   M = new Matrix4();
   // Rotate
   M.translate(-0.4, -0.15, 0.075);
@@ -368,6 +473,7 @@ function populateCubeList() {
   cubeList.push(cube);
   
   cube = new Cube(); // Create a cube object
+  cube.colors = white;
   M = new Matrix4();
   // Rotate
   M.translate(0.125, -0.15, 0.075);
@@ -380,6 +486,7 @@ function populateCubeList() {
   cubeList.push(cube); // Add the cube to the list
   
   cube = new Cube(); // Create a cube object
+  cube.colors = white;
   M = new Matrix4();
   // Rotate
   M.translate(-0.4, -0.15, 0.075); // Notice the opposites
@@ -392,6 +499,7 @@ function populateCubeList() {
   cubeList.push(cube); // Add the cube to the list
   
   cube = new Cube(); // Create a cube object
+  cube.colors = white;
   M = new Matrix4();
   // Rotate
   M.translate(0.125, -0.15, 0.075);
@@ -405,6 +513,7 @@ function populateCubeList() {
 
   //Tail
   cube = new Cube(); // Create a cube object
+  cube.colors = white;
   M = new Matrix4();
   M.translate(0.65/2, -0.15/2, 0/2);
   M.rotate(45, 0, 0, 1);
