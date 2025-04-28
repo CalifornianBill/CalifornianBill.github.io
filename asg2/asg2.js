@@ -33,19 +33,26 @@ class Cube {
 }
 
 WALK_ANIMATION = 0; // Animation progress
+HEAD_ROTATION_SIDE = 0; // Head rotation progress
+
+let lastTime = 0;
+const fpsLimit = 144; // Set the maximum FPS
+const frameTime = 1000 / fpsLimit; // Time per frame for the desired FPS
+
+let frameCount = 0;
+let fps = 0;
+let deltaSum = 0;
+
+var gl;
+var a_Position;
+var a_Color;
+var u_ModelMatrix;
+var u_GlobalRotation;
+var cubeList = [];
 
 function main() {
-  var canvasVals = setupWebGL();
-  var canvas = canvasVals[0];
-  var gl = canvasVals[1];
-
-  var glslVals = connectVariablesToGLSL(gl);
-  var a_Position = glslVals[0];
-  var a_Color = glslVals[1];
-  var u_ModelMatrix = glslVals[2];
-  var u_GlobalRotation = glslVals[3];
-
-  var cubeList = [];
+  setupWebGL();
+  connectVariablesToGLSL();
 
   // Set u_GlobalRotation to Identity
   let identityRotation = new Matrix4();
@@ -65,26 +72,33 @@ function main() {
   
   populateCubeList(cubeList);
 
-  renderScene(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList);
+  requestAnimationFrame(tick);
 
   // Attach slider event listener
   document.getElementById('xSlider').addEventListener('input', function() {
-    updateRotationAngle(gl, u_GlobalRotation);
-    clearCanvas(gl);
-    renderScene(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList);
+    updateRotationAngle();
+    clearCanvas();
+    renderScene();
   });
 
   document.getElementById('ySlider').addEventListener('input', function() {
-    updateRotationAngle(gl, u_GlobalRotation);
-    clearCanvas(gl);
-    renderScene(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList);
+    updateRotationAngle();
+    clearCanvas();
+    renderScene();
   });
 
   document.getElementById('walk').addEventListener('input', function() {
     WALK_ANIMATION = document.getElementById('walk').value; // get current slider value
+    populateCubeList();
+    clearCanvas();
+    renderScene();
+  });
+
+  document.getElementById('headSide').addEventListener('input', function() {
+    HEAD_ROTATION_SIDE = document.getElementById('headSide').value; // get current slider value
     populateCubeList(cubeList);
-    clearCanvas(gl);
-    renderScene(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList);
+    clearCanvas();
+    renderScene();
   });
 }
 
@@ -97,50 +111,46 @@ function setupWebGL() {
   }
 
   // Get the rendering context for WebGL
-  var gl = getWebGLContext(canvas);
+  gl = getWebGLContext(canvas);
   if (!gl) {
     console.log('Failed to get the rendering context for WebGL');
     return;
   }
   gl.enable(gl.DEPTH_TEST)
-
-  return [canvas, gl];
 }
 
-function connectVariablesToGLSL(gl) {
+function connectVariablesToGLSL() {
   if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
     console.log('Failed to initialize shaders.');
     return;
   }
 
-  var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
+  a_Position = gl.getAttribLocation(gl.program, 'a_Position');
   if (a_Position < 0) {
     console.log('Failed to get the storage location of a_Position');
     return;
   }
 
-  var a_Color = gl.getAttribLocation(gl.program, 'a_Color');
+  a_Color = gl.getAttribLocation(gl.program, 'a_Color');
   if (a_Color < 0) {
     console.log('Failed to get the storage location of a_Color');
     return;
   }
 
-  var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
+  u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
   if (!u_ModelMatrix) {
     console.log('Failed to get the storage location of u_ModelMatrix');
     return;
   }
 
-  var u_GlobalRotation = gl.getUniformLocation(gl.program, 'u_GlobalRotation');
+  u_GlobalRotation = gl.getUniformLocation(gl.program, 'u_GlobalRotation');
   if (!u_GlobalRotation) {
     console.log('Failed to get the storage location of u_GlobalRotation');
     return;
   }
-
-  return [a_Position, a_Color, u_ModelMatrix, u_GlobalRotation];
 }
 
-function clearCanvas(gl) {
+function clearCanvas() {
   // Specify the color for clearing <canvas>
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -242,7 +252,7 @@ function drawCube(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cube
   gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
 }
 
-function updateRotationAngle(gl, u_GlobalRotation) {
+function updateRotationAngle() {
   var xSlider = document.getElementById('xSlider');
   var xAngle = xSlider.value; // get current slider value
   var ySlider = document.getElementById('ySlider');
@@ -256,14 +266,14 @@ function updateRotationAngle(gl, u_GlobalRotation) {
   gl.uniformMatrix4fv(u_GlobalRotation, false, rotationMatrix.elements);
 }
 
-function renderScene(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList) {
+function renderScene() {
   clearCanvas(gl);
   for (var i = 0; i < cubeList.length; i++) {
     drawCube(gl, a_Position, a_Color, u_ModelMatrix, u_GlobalRotation, cubeList[i]);
   }
 }
 
-function populateCubeList(cubeList) {
+function populateCubeList() {
   // Clear the cube list
   clearCubeList(cubeList);
 
@@ -285,31 +295,45 @@ function populateCubeList(cubeList) {
 
   //Head
   cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(-1.2/2, 0.05/2, 0);
-  M.scale(0.3/2, 0.6/2, 0.6/2);
-  cube.matrix = M; // Set the model matrix for the cube
+  M1 = new Matrix4();
+  // Rotate around the rear face
+  M1.translate(-0.6, 0.025, 0);
+  M1.rotate(HEAD_ROTATION_SIDE*45, 45, 0, 1);
+  M1.translate(0.6, -0.025, 0);
+  // Translate and scale
+  M1.translate(-0.6, 0.025, 0);
+  M1.scale(0.15, 0.3, 0.3);
+  cube.matrix = M1; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
 
   //Snout
   cube = new Cube(); // Create a cube object
   M = new Matrix4();
-  M.setTranslate(-1.5/2, -0.1/2, 0);
+  // Rotate around the rear face
+  M.translate(-0.6, 0.025, 0);
+  M.rotate(HEAD_ROTATION_SIDE*45, 45, 0, 1);
+  M.translate(0.6, -0.025, 0);
+  // Translate and scale
+  M.translate(-1.5/2, -0.1/2, 0);
   M.scale(0.3/2, 0.3/2, 0.3/2);
   cube.matrix = M; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
 
   //Ears
   cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(-1.1/2, 0.45/2, 0.2/2);
+  M = new Matrix4(M1);
+  // Translate and scale
+  M.translate(0.65/2, 1.3/2, 0.65/2);
+  M.scale(1/0.15, 1/0.3, 1/0.3); // Inverse scale to make it look like a cube
   M.scale(0.1/2, 0.2/2, 0.2/2);
   cube.matrix = M; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
   
   cube = new Cube(); // Create a cube object
-  M = new Matrix4();
-  M.setTranslate(-1.1/2, 0.45/2, -0.2/2);
+  M = new Matrix4(M1);
+  // Translate and scale
+  M.translate(0.65/2, 1.3/2, -0.65/2);
+  M.scale(1/0.15, 1/0.3, 1/0.3); // Inverse scale to make it look like a cube
   M.scale(0.1/2, 0.2/2, 0.2/2);
   cube.matrix = M; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
@@ -373,9 +397,38 @@ function populateCubeList(cubeList) {
   cubeList.push(cube); // Add the cube to the list
 }
 
-function clearCubeList(cubeList) {
+function clearCubeList() {
   for (var i = 0; i < cubeList.length; i++) {
     cubeList[i] = null; // Clear the cube object
   }
   cubeList.length = 0; // Clear the array
+}
+
+function tick() {
+  const currentTime = performance.now();
+  const deltaTime = currentTime - lastTime;
+
+  frameCount++;
+  deltaSum += deltaTime; // Accumulate delta time
+  if (deltaSum >= 1000) { // Every second
+    fps = frameCount; // Set FPS based on frame count in the last second
+    frameCount = 0; // Reset frame count
+    deltaSum = 0; // Reset delta time sum
+    lastTime = currentTime; // Reset the last time
+    updateFPSText(fps); // Update the on-screen FPS counter
+  }
+
+  // Only update and render if enough time has passed to maintain the FPS limit
+  if (deltaTime >= frameTime) {
+    lastTime = currentTime;
+
+    renderScene();
+  }
+
+  requestAnimationFrame(tick);
+}
+
+function updateFPSText(fps) {
+  const fpsElement = document.getElementById('fpsCounter');
+  fpsElement.textContent = `FPS: ${fps.toFixed(1)}`;
 }
