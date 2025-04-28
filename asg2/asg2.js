@@ -399,9 +399,12 @@ function populateCubeList() {
   //Tail
   cube = new Cube(); // Create a cube object
   M = new Matrix4();
-  M.setTranslate(0.65/2, -0.15/2, 0/2);
+  M.translate(0.65/2, -0.15/2, 0/2);
   M.rotate(45, 0, 0, 1);
-  M.scale(0.2/2, 0.8/2, 0.2/2);
+  M.translate(-0.125, 0.15, 0);
+  M.rotate(-WALK_ANIMATION*45, 1, 0, 0);
+  M.translate(0.125, -0.15, 0); 
+  M.scale(0.2/2, 1/2, 0.2/2);
   cube.matrix = M; // Set the model matrix for the cube
   cubeList.push(cube); // Add the cube to the list
 }
