@@ -3,20 +3,78 @@
   <head>
     <meta charset="utf-8" />
     <title>Asg2</title>
+    <style>
+      /* Apply basic styles for the layout */
+      .container {
+        display: flex;
+        justify-content: space-between; /* Space out columns */
+        padding: 20px;
+      }
+
+      .left-column {
+        width: 45%; /* Set width for left column */
+        padding-right: 20px; /* Space between columns */
+      }
+
+      .right-column {
+        width: 45%; /* Set width for right column */
+        padding-left: 20px; /* Space between columns */
+        border-left: 2px solid #ccc; /* Optional border to separate columns */
+      }
+
+      /* Ensure canvas takes full available width in the left column */
+      canvas {
+        width: 800px;
+        height: 800px;
+      }
+
+      /* Style the FPS counter */
+      #fpsCounter {
+        position: absolute;
+        top: 35px;
+        left: 35px;
+        color: green;
+        font-size: 20px;
+        z-index: 1; /* Ensure it's above other elements */
+      }
+    </style>
   </head>
 
   <body onload="main()">
-    <div id="fpsCounter" style="position: fixed; top: 10px; left: 10px; color: green; font-size: 20px;">FPS: 0</div>
-    <canvas id="webgl" width="800" height="800">
-    Please use a browser that supports "canvas"
-    </canvas><br/>
-    <input type="range" id="ySlider" min="-360" max="360" value="0" step="1"/>
-    <input type="range" id="xSlider" min="-360" max="360" value="0" step="1"/><br/>
-    WALK_ANIMATION: <input type="range" id="walk" min="-1" max="1" value="0" step="0.01"/><br/>
-    <input type="button" id="walkAnimButton" value="Toggle Walk Animation"><br/>
-    Rotate Head: <input type="range" id="headSide" min="-1" max="1" value="0" step="0.01"/><br/>
-    Open Mouth: <input type="range" id="mouth" min="0" max="1" value="0" step="0.01"/><br/>
-    <input type="button" id="pyramidButton" value="Draw Pyramid Primative"><br/>
+    <div class="container">
+      <!-- Left Column with current content -->
+      <div class="left-column">
+        <div id="fpsCounter">FPS: 0</div>
+        <canvas id="webgl" width="800" height="800">
+          Please use a browser that supports "canvas"
+        </canvas><br />
+        <input type="range" id="ySlider" min="-360" max="360" value="0" step="1" />
+        <input type="range" id="xSlider" min="-360" max="360" value="0" step="1" /><br />
+        WALK_ANIMATION: <input type="range" id="walk" min="-1" max="1" value="0" step="0.01" /><br />
+        <input type="button" id="walkAnimButton" value="Toggle Walk Animation"><br />
+        Rotate Head: <input type="range" id="headSide" min="-1" max="1" value="0" step="0.01" /><br />
+        Open Mouth: <input type="range" id="mouth" min="0" max="1" value="0" step="0.01" /><br />
+        <input type="button" id="pyramidButton" value="Draw Pyramid Primitive"><br />
+      </div>
+
+      <!-- Right Column for text -->
+      <div class="right-column">
+        <h3>Notes to grader</h3>
+        <p>
+          At some point I had issues with firefox but I think it was a local machine issue. Try chrome if you have issues.
+        </p>
+        <p>My third level joint is the jaw. In order to fit it into the model without adding
+          an extraneous limb, I connected the jaw to the snout
+        </p>
+        <p>
+          It also wouldnt look natural to have a non primative in the model so there is a button
+          to draw a pyramid primitive. The pyramid is drawn above the model
+        </p>
+        <p>
+          My shift click also has sound so be warned if its loud.
+        </p>
+      </div>
+    </div>
 
     <script src="../lib/webgl-utils.js"></script>
     <script src="../lib/webgl-debug.js"></script>
