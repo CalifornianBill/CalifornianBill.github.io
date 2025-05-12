@@ -519,6 +519,7 @@ function tick() {
     lastTime = currentTime;
     updateFPSText(fps);
   }
+  frameCount++;
 
   if (deltaTime >= frameTime) {
     lastTime = currentTime;
