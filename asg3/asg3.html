@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Asg3</title>
+    <style>
+      /* Apply basic styles for the layout */
+      .container {
+        display: flex;
+        justify-content: space-between; /* Space out columns */
+        padding: 20px;
+      }
+
+      .left-column {
+        width: 45%; /* Set width for left column */
+        padding-right: 20px; /* Space between columns */
+      }
+
+      .right-column {
+        width: 45%; /* Set width for right column */
+        padding-left: 20px; /* Space between columns */
+        border-left: 2px solid #ccc; /* Optional border to separate columns */
+      }
+
+      /* Ensure canvas takes full available width in the left column */
+      canvas {
+        width: 800px;
+        height: 800px;
+      }
+
+      /* Style the FPS counter */
+      #fpsCounter {
+        position: absolute;
+        top: 35px;
+        left: 35px;
+        color: red;
+        font-size: 20px;
+        z-index: 1; /* Ensure it's above other elements */
+      }
+    </style>
+  </head>
+
+  <body onload="main()">
+    <div class="container">
+      <!-- Left Column with current content -->
+      <div class="left-column">
+        <div id="fpsCounter">FPS: 0</div>
+        <canvas id="webgl" width="800" height="800">
+          Please use a browser that supports "canvas"
+        </canvas><br />
+      </div>
+
+      <!-- Right Column for text -->
+      <div class="right-column">
+        <h3>Notes to grader</h3>
+        <p>Textures only load after any user input and are randomized to show the 2 textures</p>
+        <p>Mouse camera movement is more laggy because how often mousemove is called</p>
+        <h3>Controls:</h3>
+        <p>
+          <strong>WASD</strong> - Move<br />
+          <strong>Q/E</strong> - Rotate Left/Right<br />
+          <strong>R</strong> - Raise Height on current square "Place Block"<br />
+          <strong>F</strong> - Lower Height on current square "Remove Block"<br />
+          <h3>Wow Feature:</h3>
+        <p>
+          Custom Grid Editor<br />
+          <textarea id="largeTextbox" rows="26" cols="64">
+            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+          </textarea><br />
+          <button id="submitButton" onclick="submitGrid()">Load Grid</button>
+        </p>
+        <h3>Simple Story:</h3>
+        <p>
+          This rendition of a California mission ruins in a cube world captures the overall layout and structure although simplified for the brick world. The mission is composed of rectangular buildings, and a central courtyard, all built with uniform cubes. Openings represent doors and unfortunately the way the assignment is designed, windows are not possible, while the layout includes enclosed spaces, and a surrounding boundary wall. The environment is minimal, focusing on shape and symmetry to evoke the essence of the mission without relying on detailed textures or specific materials.
+        </p>
+      </div>
+    </div>
+
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix-cse160.js"></script>
+    <script src="camera.js"></script>
+    <script src="cube.js"></script>
+    <script src="asg3.js"></script>
+  </body>
+</html>
