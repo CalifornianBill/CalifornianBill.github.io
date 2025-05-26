@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Asg4</title>
+    <style>
+      /* Apply basic styles for the layout */
+      .container {
+        display: flex;
+        justify-content: space-between; /* Space out columns */
+        padding: 20px;
+      }
+
+      .left-column {
+        width: 45%; /* Set width for left column */
+        padding-right: 20px; /* Space between columns */
+      }
+
+      .right-column {
+        width: 45%; /* Set width for right column */
+        padding-left: 20px; /* Space between columns */
+        border-left: 2px solid #ccc; /* Optional border to separate columns */
+      }
+
+      /* Ensure canvas takes full available width in the left column */
+      canvas {
+        width: 800px;
+        height: 800px;
+      }
+
+      /* Style the FPS counter */
+      #fpsCounter {
+        position: absolute;
+        top: 35px;
+        left: 35px;
+        color: red;
+        font-size: 20px;
+        z-index: 1; /* Ensure it's above other elements */
+      }
+    </style>
+  </head>
+
+  <body onload="main()">
+    <div class="container">
+      <!-- Left Column with current content -->
+      <div class="left-column">
+        <div id="fpsCounter">FPS: 0</div>
+        <canvas id="webgl" width="800" height="800">
+          Please use a browser that supports "canvas"
+        </canvas><br />
+      </div>
+
+      <!-- Right Column for text -->
+      <div class="right-column">
+        <button onclick="toggleLighting()">Disable/Enable Lighting</button><br /><br />
+        <button onclick="showNormals()">Show/Hide Normals</button><br /><br />
+        <button onclick="toggleLightType()">Change Point/Spot Light</button><br /><br />
+        <button onclick="toggleRotation()">Start/Stop Auto Rotation</button><br /><br />
+        Light Rotation<br />
+        <input type="range" id="lightRotation" min="0" max="2" value="0" step="0.01"><br />
+        <button onclick="toggleColor()">White/Color Light</button><br /><br />
+        Light Hue<br />
+        <input type="range" id="lightColor" min="0" max="360" value="0" step="1">
+        <h3>Notes to grader</h3>
+        <p>WASD to move<br />
+          Mouse to look around or q and e for left and right<br /><br />
+          The flying multi-colored cube is a the light<br />
+          To manually control the light, Stop the auto rotation<br />
+          The point light circles around the objects and the spot light moves left and right above them<br />
+        </p>
+      </div>
+    </div>
+
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix-cse160.js"></script>
+    <script src="camera.js"></script>
+    <script src="cube.js"></script>
+    <script src="asg4.js"></script>
+  </body>
+</html>
