@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Asg5</title>
+    <style>
+      body { margin: 0; overflow: hidden; }
+      canvas { display: block; }
+
+      #toggleButton {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 10px 16px;
+        background: #222;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        z-index: 10;
+      }
+      #toggleButton:hover {
+        background: #444;
+      }
+
+      #infoBox {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.75);
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        font-family: sans-serif;
+        max-width: 800px;
+        box-shadow: 0 0 10px #000;
+
+        display: inline-block;
+      }
+
+      #infoBox button {
+        display: block;
+        margin-bottom: 8px;
+        background: #555;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      #infoBox button:hover {
+        background: #777;
+      }
+
+      #infoContent {
+        transition: opacity 0.2s ease;    
+        margin-bottom: 8px;
+      }
+    </style>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.176.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.176.0/examples/jsm/"
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <button id="toggleButton" style="position: absolute; top: 10px; left: 10px; z-index: 1;">
+      Mute
+    </button>
+    <div id="infoBox">
+      <button id="toggleInfoBtn">Hide</button>
+      <div id="infoContent">
+        <p>Notes To Grader:</p>
+        <p>There is a mute button in the top left</p>
+        <p>Click and Drag to look around</p>
+        <p>WASD to move</p>
+        <p>Space to move up Ctrl to move down</p>
+        <p>The three lights are a spot light on the central platform</p>
+        <p>a point light circling the scene and a hemisphere light</p>
+        <p>For the wow point I tried to make the world visually (and audio) impressive</p>
+        <p>through the maxwell rave</p>
+      </div>
+    </div>
+    <script type="module" src="asg5.js"></script>
+  </body>
+</html>
